@@ -1,0 +1,114 @@
+---
+title: "Kritzer_736_hw2"
+format: pdf
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Part A
+
+Question 1:
+
+```{r}
+library(dplyr)
+install.packages("tidyr", repos = "http://cran.us.r-project.org")
+library(tidyr)
+data <- read.csv("C:\\Users\\tamar\\OneDrive - McMaster University\\PhD Courses\\Kinesiol-736\\lord-of-the-rings-trilogy.csv")
+
+print(data)
+```
+
+Question 2:
+
+-   Column names are not in a consistent format (e.g., capitals at different areas, wrong variable, etc.)
+
+-   The columns combine 2 variables in 1 (i.e., race and gender)
+
+-   Wide format instead of long.
+
+Question 3:
+
+-   4 Columns: movie, race, gender, words spoken
+
+-   18 Rows: 3 movies x 6 race-gender combos = 18
+
+Question 4:
+
+-   Column Names: movie, race, gender, words spoken
+
+## Part B
+
+Question 1:
+
+```{r}
+data <- data %>%
+  rename(Elf_female = elf_female,
+         Elf_male = elf_male,
+         Hobbit_female = Hobbit_female,
+         Hobbit_male = hobbit_Male,
+         Man_female = man_Female,
+         Man_male = Man_male)
+```
+
+```{r}
+tidy_data <- data %>%
+  pivot_longer(cols = -movie,
+               names_to = c("race", "gender"),
+               names_pattern = "(.*)_(.*)",
+               values_to = "words_spoken")
+
+print(tidy_data)
+```
+
+
+Question 2a:
+
+```{r}
+total_hobbit_male <- tidy_data %>%
+  filter(race == "Hobbit" & gender == "male") %>%
+  summarise(total_words = sum(words_spoken, na.rm = TRUE))
+print(total_hobbit_male)
+```
+
+Question 2b:
+```{r}
+total_elf_female <- tidy_data %>%
+  filter(race == "Elf" & gender == "female") %>%
+  summarise(total_words = sum(words_spoken, na.rm = TRUE))
+print(total_elf_female)
+```
+
+Question 2c:
+```{r}
+total_elf_male <- tidy_data %>%
+  filter(race == "Elf" & gender == "male") %>%
+  summarise(total_words = sum(words_spoken, na.rm = TRUE))
+print(total_elf_male)
+```
+
+Question 3 (self-counted):
+- Fellowship: Hobbit
+- Two Towers: Man 
+- Return of King: Man
+
+Question 3:
+```{r}
+# Summarize total words spoken by race for each movie
+race_totals <- tidy_data %>%
+  group_by(movie, race) %>%
+  summarise(total_words = sum(words_spoken, na.rm = TRUE), .groups = 'drop')
+
+# Find the race that dominates each movie
+dominant_race <- race_totals %>%
+  group_by(movie) %>%
+  filter(total_words == max(total_words)) %>%
+  ungroup()
+
+print(dominant_race)
+```
+
+Question 4: Yes, the hobbit is the most dominant in the fellowship whereas the man is more dominant in the return of the king and the two towers.
+

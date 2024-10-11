@@ -1,0 +1,208 @@
+---
+title: "Homework assignment 1"
+author: "Tamar Kritzer"
+format: pdf
+---
+
+Question 1:
+```{r}
+install.packages("babynames", repos = "http://cran.us.r-project.org")
+library(dplyr)
+library(babynames)
+```
+
+Question 2:
+```{r}
+print(babynames)
+```
+Observations = 1924665
+Variables = 5
+
+Question 3:
+```{r}
+data_dictionary <- data.frame(
+  Variable_Name = c("year", "sex", "name", "n", "prop"),
+  Data_Type = c("integer", "character", "character", "integer", "numeric"),
+  Description = c(
+    "The year of birth for the name.",
+    "Sex of the baby (M or F).",
+    "Name given to the baby.",
+    "The number of babies given this name in that year.",
+    "Proportion of babies with this name relative to all born that year."
+  )
+)
+
+print(data_dictionary)
+```
+
+Question 4:
+1880 to 2017
+```{r}
+year_range <- babynames %>%
+  summarize(min_year = min(year), max_year = max(year))
+print(year_range)
+```
+
+Question 5:
+```{r}
+bbynm_no_n <- babynames %>% select(-n)
+print(bbynm_no_n)
+```
+
+Question 6:
+Props allows for easier comparison across different years and population sizes. n is raw data whereas Props is normalized to the population.
+
+Question 7:
+```{r}
+second_millennium <- bbynm_no_n %>% filter(year <= 2000)
+
+popular_2nd_millennium <- second_millennium %>%
+  group_by(sex) %>%
+  filter(prop == max(prop)) %>%
+  select(year, sex, name, prop)
+
+print(popular_2nd_millennium)
+
+third_millennium <- bbynm_no_n %>% filter(year >= 2001)
+
+popular_3rd_millennium <- third_millennium %>%
+  group_by(sex) %>%
+  filter(prop == max(prop)) %>%
+  select(year, sex, name, prop)
+
+print(popular_3rd_millennium)
+```
+2nd Mill: F = Mary, M = John
+3rd Mill: F = Emily, M = Jacob
+
+Question 8:
+```{r}
+filtered_names <- bbynm_no_n %>%
+  filter(year >= 2000 & year <= 2012)
+
+filtered_qvx <- filtered_names %>%
+  filter(substr(name, 1, 1) %in% c("Q", "V", "X"))
+
+most_popular_qvx <- filtered_qvx %>%
+  group_by(substr(name, 1, 1), sex) %>%
+  filter(prop == max(prop)) %>%
+  select(year, sex, name, prop)
+
+print(most_popular_qvx)
+```
+
+Question 9:
+```{r}
+babynames_with_decade <- babynames %>%
+  mutate(decade = floor(year / 10) * 10)
+
+print(babynames_with_decade)
+```
+
+Question 10:
+```{r}
+decade_mean_median <- babynames_with_decade %>%
+  group_by(decade, sex) %>%
+  summarise(
+    mean_n = mean(n),
+    median_n = median(n)
+  )
+
+print(decade_mean_median)
+```
+
+Question 11:
+a) Tamar
+```{r}
+tamar_popularity <- babynames_with_decade %>%
+  filter(name == "Tamar") %>%
+  select(year, decade, sex, n, prop)
+```
+
+Tamar - Decade: 1980
+```{r}
+tamar_most_pop_decade <- tamar_popularity %>%
+  group_by(decade, sex) %>%
+  summarise(total_n = sum(n), .groups = "drop") %>%
+  arrange(desc(total_n))
+head(tamar_most_pop_decade,3)
+```
+
+Tamar - Year: 1977
+```{r}
+tamar_most_pop_year <- tamar_popularity %>%
+  group_by(year, sex) %>%
+  summarise(total_n = sum(n), .groups = "drop") %>%
+  arrange(desc(total_n))
+head(tamar_most_pop_year,3)
+```
+
+b) Dylan
+```{r}
+dylan_popularity <- babynames_with_decade %>%
+  filter(name == "Dylan") %>%
+  select(year, decade, sex, n, prop)
+```
+Dylan - Decade: 2000
+```{r}
+dyl_most_pop_decade <- dylan_popularity %>%
+  group_by(decade, sex) %>%
+  summarise(total_n = sum(n), .groups = "drop") %>%
+  arrange(desc(total_n))
+head(dyl_most_pop_decade,3)
+```
+Dylan - Year: 2001
+```{r}
+dyl_most_pop_year <- dylan_popularity %>%
+  group_by(year, sex) %>%
+  summarise(total_n = sum(n), .groups = "drop") %>%
+  arrange(desc(total_n))
+head(dyl_most_pop_year,3)
+```
+
+
+c) Jack & Scott
+```{r}
+jack_popularity <- babynames_with_decade %>%
+  filter(name == "Jack") %>%
+  select(year, decade, sex, n, prop)
+```
+Jack - Decade: 1920 
+```{r}
+jack_most_pop_decade <- jack_popularity %>%
+  group_by(decade, sex) %>%
+  summarise(total_n = sum(n), .groups = "drop") %>%
+  arrange(desc(total_n))
+head(jack_most_pop_decade,3)
+```
+Jack - Year: 1927
+```{r}
+jack_most_pop_year <- jack_popularity %>%
+  group_by(year, sex) %>%
+  summarise(total_n = sum(n), .groups = "drop") %>%
+  arrange(desc(total_n))
+head(jack_most_pop_year,3)
+```
+
+```{r}
+scott_popularity <- babynames_with_decade %>%
+  filter(name == "Scott") %>%
+  select(year, decade, sex, n, prop)
+```
+Scott - Decade: 1960
+```{r}
+Sc_most_pop_decade <- scott_popularity %>%
+  group_by(decade, sex) %>%
+  summarise(total_n = sum(n), .groups = "drop") %>%
+  arrange(desc(total_n))
+head(Sc_most_pop_decade,3)
+```
+Scott - Year: 1971
+```{r}
+Sc_most_pop_year <- scott_popularity %>%
+  group_by(year, sex) %>%
+  summarise(total_n = sum(n), .groups = "drop") %>%
+  arrange(desc(total_n))
+head(Sc_most_pop_year,3)
+```
+ 
